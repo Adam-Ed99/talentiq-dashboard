@@ -1,46 +1,35 @@
+import streamlit as st
 import pandas as pd
 from pathlib import Path
 import os
 
-print("=== LOADER DEBUG ===")
-print(f"Working directory: {os.getcwd()}")
-print(f"Files in root: {os.listdir('.')}")
-
-# Dossier racine de tes datasets
-DATA_ROOT = Path("Talent Datasets-premium")
-print(f"DATA_ROOT path: {DATA_ROOT}")
-print(f"DATA_ROOT exists: {DATA_ROOT.exists()}")
-print(f"DATA_ROOT is dir: {DATA_ROOT.is_dir()}")
-
-if DATA_ROOT.exists():
-    print(f"Files in DATA_ROOT: {os.listdir(DATA_ROOT)}")
-    csv_files = list(DATA_ROOT.glob("*.csv"))
-    print(f"CSV files found: {[f.name for f in csv_files]}")
-
+@st.cache_data
 def load_all_datasets():
-    print("=== load_all_datasets START ===")
+    st.write("🔍 Scanning for datasets...")
+    
+    # Scan TOUS les CSV du projet (racine + sous-dossiers)
+    root = Path(".")
+    all_csv = list(root.rglob("*.csv"))
+    
+    st.write(f"📁 Found {len(all_csv)} CSV files:")
+    for csv in all_csv:
+        st.write(f"  - {csv}")
+    
     datasets = {}
-    
-    if not DATA_ROOT.exists():
-        print(f"ERROR: DATA_ROOT does not exist: {DATA_ROOT}")
-        return datasets
-        
-    print(f"Scanning {DATA_ROOT} for CSV files...")
-    csv_files = list(DATA_ROOT.rglob("*.csv"))
-    print(f"Found {len(csv_files)} CSV files: {[f.name for f in csv_files]}")
-    
-    for csv in csv_files:
+    for csv in all_csv:
         try:
-            print(f"Loading {csv}...")
             df = pd.read_csv(csv)
-            print(f"  -> Loaded {len(df)} rows")
-            if not df.empty:
-                datasets[csv.stem] = df
-            else:
-                print(f"  -> Empty dataset skipped")
+            if len(df) > 0:
+                name = csv.stem
+                datasets[name] = df
+                st.success(f"✅ Loaded {name} ({len(df)} rows)")
         except Exception as e:
-            print(f"ERROR loading {csv}: {e}")
+            st.error(f"❌ Error {csv.name}: {e}")
     
-    print(f"Final datasets: {list(datasets.keys())}")
-    print("=== load_all_datasets END ===")
+    st.write(f"🎯 {len(datasets)} datasets ready!")
     return datasets
+
+# Test direct
+if __name__ == "__main__":
+    datasets = load_all_datasets()
+    print(list(datasets.keys()))
