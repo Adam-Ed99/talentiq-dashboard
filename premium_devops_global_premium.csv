@@ -1,0 +1,3 @@
+username,full_name,location,email,followers,public_repos,company,bio,blog,profile_url,scraped_at,talent_score
+vdotsey,Vivienne Dotsey,"Accra, Ghana or Remote",,49,7,Jomacs IT,DevOps Engineer | CI/CD | Kubernetes | Terraform |  Cloud & Automation Enthusiast,,https://github.com/vdotsey,2025-12-07T17:09:53.511752,105
+csayler,Craig Sayler,Seattle - Remote,craig.sayler@gmail.com,9,9," Previously ViaSat, NASA , HPE, Bain, Sailpoint, Teradata","Principal Cybersecurity Engineer/Architect, DevOps, Cloud, ZeroTrust, Kubernetes, Docker, OpenStack, AWS, GCP, Linux, HPC, Ansible, Terraform, HELM",,https://github.com/csayler,2025-12-07T17:09:54.029086,27
