@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import os
 from supabase import create_client, Client
 
 # Supabase credentials
@@ -107,3 +108,4 @@ else:
 # Footer
 st.markdown("---")
 st.markdown("**DIGISPHERELLC LLC** - Tech Talent Intelligence")
+
