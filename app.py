@@ -3,19 +3,20 @@ import pandas as pd
 import os
 from supabase import create_client, Client
 
-# ==============================
-# PAGE CONFIG (DOIT ÊTRE EN PREMIER)
-# ==============================
+# =============================
+# PAGE CONFIG (TOUJOURS EN PREMIER)
+# =============================
 st.set_page_config(
-    page_title="TalentIQ AI Engine",
-    layout="wide"
+    page_title="TalentIQ AI",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-# ==============================
-# SUPABASE SECRETS (STREAMLIT CLOUD)
-# ==============================
-SUPABASE_URL = st.secrets["supabase"]["SUPABASE_URL"]
-SUPABASE_KEY = st.secrets["supabase"]["SUPABASE_ANON_KEY"]
+# =============================
+# SUPABASE CONFIG
+# =============================
+SUPABASE_URL = st.secrets.get("SUPABASE_URL", "")
+SUPABASE_KEY = st.secrets.get("SUPABASE_ANON_KEY", "")
 
 @st.cache_resource
 def init_supabase() -> Client:
@@ -26,110 +27,110 @@ def init_supabase() -> Client:
 
 supabase = init_supabase()
 
-# ==============================
-# SESSION / USER
-# ==============================
-def get_current_user():
+# =============================
+# SESSION STATE
+# =============================
+if "user" not in st.session_state:
+    st.session_state.user = None
+
+# =============================
+# AUTH FUNCTIONS
+# =============================
+def login(email: str, password: str):
     try:
-        response = supabase.auth.get_user()
-        return response.user
+        res = supabase.auth.sign_in_with_password({
+            "email": email,
+            "password": password
+        })
+        st.session_state.user = res.user
+        st.rerun()
     except Exception:
-        return None
+        st.error("❌ Login failed. Check email or password.")
 
-user = get_current_user()
+def logout():
+    supabase.auth.sign_out()
+    st.session_state.user = None
+    st.rerun()
 
-# ==============================
-# SIDEBAR AUTH
-# ==============================
+user = st.session_state.user
+
+# =============================
+# SIDEBAR AUTH UI
+# =============================
 with st.sidebar:
-    st.title("🔐 TalentIQ AI")
+    st.title("🔐 TalentIQ")
 
     if not user:
         st.subheader("Sign in")
         email = st.text_input("Email")
         password = st.text_input("Password", type="password")
-
         if st.button("Login 🚀", use_container_width=True):
-            try:
-                supabase.auth.sign_in_with_password({
-                    "email": email,
-                    "password": password
-                })
-                st.rerun()
-            except Exception as e:
-                st.error("Login failed")
-
+            login(email, password)
     else:
         st.success(f"✅ {user.email}")
-        if st.button("Logout 🚪", use_container_width=True):
-            supabase.auth.sign_out()
-            st.rerun()
+        if st.button("🚪 Logout", use_container_width=True):
+            logout()
 
-# ==============================
-# MAIN APP
-# ==============================
-if not user:
-    st.header("Welcome to TalentIQ AI Engine")
-    st.info("Please sign in to access premium datasets.")
-    st.stop()
+# =============================
+# MAIN APP LOGIC
+# =============================
+if user:
+    # ----- SUBSCRIPTION CHECK -----
+    try:
+        result = (
+            supabase
+            .table("customers")
+            .select("subscription_status")
+            .eq("email", user.email)
+            .execute()
+        )
 
-# ==============================
-# SUBSCRIPTION CHECK
-# ==============================
-try:
-    result = (
-        supabase
-        .table("customers")
-        .select("subscription_status")
-        .eq("email", user.email)
-        .execute()
-    )
+        if not result.data or result.data[0]["subscription_status"] != "active":
+            st.warning("❌ Active subscription required.")
+            st.stop()
 
-    if not result.data or result.data[0]["subscription_status"] != "active":
-        st.error("❌ Active subscription required.")
+    except Exception:
+        st.error("⚠️ Subscription system error.")
         st.stop()
 
-except Exception:
-    st.error("❌ Subscription system not configured.")
-    st.stop()
+    # ----- DASHBOARD -----
+    st.title("🎯 TalentIQ Premium Dashboard")
+    st.caption("DIGISPHERELLC LLC — Market Intelligence")
 
-# ==============================
-# DASHBOARD
-# ==============================
-st.title("📊 TalentIQ Premium Dashboard")
-st.caption("DIGISPHERE LLC — Market Intelligence Engine")
+    DATASET_PATH = "premium_architects.csv"
 
-DATASET_FILE = "premium_architects.csv"
+    if os.path.exists(DATASET_PATH):
+        df = pd.read_csv(DATASET_PATH)
 
-if not os.path.exists(DATASET_FILE):
-    st.error(f"Dataset not found: {DATASET_FILE}")
-    st.stop()
+        tab1, tab2, tab3 = st.tabs([
+            "📊 Overview",
+            "🔍 Search",
+            "📤 Export"
+        ])
 
-df = pd.read_csv(DATASET_FILE)
+        with tab1:
+            st.metric("Total Profiles", len(df))
+            st.dataframe(df.head(50), use_container_width=True)
 
-tab1, tab2, tab3 = st.tabs([
-    "📊 Overview",
-    "🔍 Search",
-    "📤 Export"
-])
+        with tab2:
+            query = st.text_input("Search by name, skill or city")
+            if query:
+                filtered_df = df[
+                    df.astype(str)
+                    .apply(lambda row: row.str.contains(query, case=False).any(), axis=1)
+                ]
+                st.dataframe(filtered_df, use_container_width=True)
 
-with tab1:
-    st.metric("Total Profiles", len(df))
-    st.dataframe(df.head(100), use_container_width=True)
+        with tab3:
+            st.download_button(
+                "📥 Download full dataset",
+                df.to_csv(index=False),
+                file_name="talentiq_export.csv",
+                mime="text/csv"
+            )
+    else:
+        st.error(f"Dataset file '{DATASET_PATH}' not found.")
 
-with tab2:
-    search = st.text_input("Search by skill, role, city, country...")
-    if search:
-        filtered_df = df[
-            df.astype(str)
-            .apply(lambda row: row.str.contains(search, case=False).any(), axis=1)
-        ]
-        st.dataframe(filtered_df, use_container_width=True)
-
-with tab3:
-    st.download_button(
-        label="📥 Download full dataset",
-        data=df.to_csv(index=False),
-        file_name="talentiq_export.csv",
-        mime="text/csv"
-    )
+else:
+    st.title("👋 Welcome to TalentIQ")
+    st.info("Please sign in from the sidebar to access premium datasets.")
