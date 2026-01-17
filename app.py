@@ -14,8 +14,8 @@ st.set_page_config(
 # ==============================
 # SUPABASE SECRETS (STREAMLIT CLOUD)
 # ==============================
-SUPABASE_URL = st.secrets.get("SUPABASE_URL")
-SUPABASE_KEY = st.secrets.get("SUPABASE_ANON_KEY")
+SUPABASE_URL = st.secrets["supabase"]["SUPABASE_URL"]
+SUPABASE_KEY = st.secrets["supabase"]["SUPABASE_ANON_KEY"]
 
 @st.cache_resource
 def init_supabase() -> Client:
