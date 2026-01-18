@@ -15,9 +15,8 @@ st.set_page_config(
 # =============================
 # SUPABASE CONFIG
 # =============================
-[supabase]
-SUPABASE_URL = "https://xxxxxxxx.supabase.co"
-SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+SUPABASE_URL = st.secrets.get("SUPABASE_URL")
+SUPABASE_KEY = st.secrets.get("SUPABASE_ANON_KEY")
 
 
 @st.cache_resource
@@ -99,10 +98,24 @@ if user:
     st.title("🎯 TalentIQ Premium Dashboard")
     st.caption("DIGISPHERELLC LLC — Market Intelligence")
 
-    DATASET_PATH = "premium_architects.csv"
+    DATASETS_DIR = "datasets"
 
-    if os.path.exists(DATASET_PATH):
-        df = pd.read_csv(DATASET_PATH)
+    # Scan for CSV files
+    try:
+        csv_files = [f for f in os.listdir(DATASETS_DIR) if f.endswith('.csv')]
+    except FileNotFoundError:
+        st.error(f"Directory not found: '{DATASETS_DIR}'")
+        st.stop()
+
+    if not csv_files:
+        st.warning(f"No CSV datasets found in '{DATASETS_DIR}'.")
+        st.stop()
+    
+    selected_dataset = st.selectbox("Select a Dataset to analyze:", csv_files)
+    
+    if selected_dataset:
+        dataset_path = os.path.join(DATASETS_DIR, selected_dataset)
+        df = pd.read_csv(dataset_path)
 
         tab1, tab2, tab3 = st.tabs([
             "📊 Overview",
@@ -125,15 +138,12 @@ if user:
 
         with tab3:
             st.download_button(
-                "📥 Download full dataset",
+                f"📥 Download {selected_dataset}",
                 df.to_csv(index=False),
-                file_name="talentiq_export.csv",
+                file_name=selected_dataset,
                 mime="text/csv"
             )
-    else:
-        st.error(f"Dataset file '{DATASET_PATH}' not found.")
 
 else:
     st.title("👋 Welcome to TalentIQ")
     st.info("Please sign in from the sidebar to access premium datasets.")
-
