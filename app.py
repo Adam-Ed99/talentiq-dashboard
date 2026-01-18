@@ -15,8 +15,10 @@ st.set_page_config(
 # =============================
 # SUPABASE CONFIG
 # =============================
-SUPABASE_URL = st.secrets.get("SUPABASE_URL", "")
-SUPABASE_KEY = st.secrets.get("SUPABASE_ANON_KEY", "")
+[supabase]
+SUPABASE_URL = "https://xxxxxxxx.supabase.co"
+SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
 
 @st.cache_resource
 def init_supabase() -> Client:
@@ -134,3 +136,4 @@ if user:
 else:
     st.title("👋 Welcome to TalentIQ")
     st.info("Please sign in from the sidebar to access premium datasets.")
+
