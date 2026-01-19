@@ -29,13 +29,15 @@ def init_supabase() -> Client:
 supabase = init_supabase()
 
 # =============================
-# SESSION STATE
+# SESSION STATE AVEC PERSISTANCE
 # =============================
-if "user" not in st.session_state:
-    st.session_state.user = None
+if "user_email" not in st.session_state:
+    st.session_state.user_email = None
+if "user_id" not in st.session_state:
+    st.session_state.user_id = None
 
 # =============================
-# AUTH FUNCTIONS
+# AUTH FUNCTIONS AVEC PERSISTANCE
 # =============================
 def login(email: str, password: str):
     try:
@@ -43,17 +45,26 @@ def login(email: str, password: str):
             "email": email,
             "password": password
         })
-        st.session_state.user = res.user
+        # STOCKAGE PERSISTANT dans session_state
+        st.session_state.user_email = res.user.email
+        st.session_state.user_id = res.user.id
+        st.success("✅ Login successful!")
         st.rerun()
-    except Exception:
-        st.error("❌ Login failed. Check email or password.")
+    except Exception as e:
+        st.error(f"❌ Login failed: {str(e)}")
 
 def logout():
-    supabase.auth.sign_out()
-    st.session_state.user = None
+    try:
+        supabase.auth.sign_out()
+    except:
+        pass
+    # Nettoyage session
+    st.session_state.user_email = None
+    st.session_state.user_id = None
     st.rerun()
 
-user = st.session_state.user
+# Récupération de l'utilisateur depuis session_state
+user_email = st.session_state.user_email
 
 # =============================
 # SIDEBAR AUTH UI
@@ -61,37 +72,41 @@ user = st.session_state.user
 with st.sidebar:
     st.title("🔐 TalentIQ")
 
-    if not user:
+    if not user_email:
         st.subheader("Sign in")
         email = st.text_input("Email")
         password = st.text_input("Password", type="password")
         if st.button("Login 🚀", use_container_width=True):
-            login(email, password)
+            if email and password:
+                login(email, password)
+            else:
+                st.warning("Please enter email and password")
     else:
-        st.success(f"✅ {user.email}")
+        st.success(f"✅ {user_email}")
         if st.button("🚪 Logout", use_container_width=True):
             logout()
 
 # =============================
 # MAIN APP LOGIC
 # =============================
-if user:
+if user_email:
     # ----- SUBSCRIPTION CHECK -----
     try:
         result = (
             supabase
             .table("customers")
             .select("subscription_status")
-            .eq("email", user.email)
+            .eq("email", user_email)
             .execute()
         )
 
         if not result.data or result.data[0]["subscription_status"] != "active":
             st.warning("❌ Active subscription required.")
+            st.info("Contact support@digispherellc.com to activate your subscription.")
             st.stop()
 
-    except Exception:
-        st.error("⚠️ Subscription system error.")
+    except Exception as e:
+        st.error(f"⚠️ Subscription system error: {str(e)}")
         st.stop()
 
     # ----- DASHBOARD -----
