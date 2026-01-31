@@ -162,3 +162,4 @@ if user_email:
 else:
     st.title("👋 Welcome to TalentIQ")
     st.info("Please sign in from the sidebar to access premium datasets.")
+
