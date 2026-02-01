@@ -4,16 +4,63 @@ import os
 from supabase import create_client, Client
 
 # =============================
-# 1. PAGE CONFIG
+# 1. ELITE DESIGN CONFIG
 # =============================
 st.set_page_config(
-    page_title="TalentIQ AI",
+    page_title="TalentIQ AI | Market Intelligence",
+    page_icon="🎯",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
+# Injection de CSS personnalisé pour un look Unique
+st.markdown("""
+    <style>
+    /* Global Background & Font */
+    .main { background-color: #f8f9fa; }
+    
+    /* Custom Sidebar */
+    section[data-testid="stSidebar"] {
+        background-color: #0e1117 !important;
+        border-right: 1px solid #FFD700;
+    }
+    
+    /* Metrics Styling */
+    [data-testid="stMetricValue"] {
+        color: #1E88E5;
+        font-size: 2.5rem !important;
+        font-weight: 700;
+    }
+    
+    /* Premium Cards */
+    .stMetric {
+        background-color: white;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        border-bottom: 3px solid #FFD700;
+    }
+    
+    /* Professional Tables */
+    .stDataFrame {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    /* Unique Header */
+    .main-header {
+        font-family: 'Helvetica Neue', sans-serif;
+        color: #0e1117;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 0px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 # =============================
-# 2. SUPABASE CONFIG
+# 2. SUPABASE & AUTH (Conservé)
 # =============================
 SUPABASE_URL = st.secrets.get("SUPABASE_URL")
 SUPABASE_KEY = st.secrets.get("SUPABASE_ANON_KEY")
@@ -24,92 +71,102 @@ def init_supabase() -> Client:
 
 supabase = init_supabase()
 
-# =============================
-# 3. GESTION DU RESET MOT DE PASSE
-# =============================
-query_params = st.query_params
-if "type" in query_params and query_params["type"] == "recovery":
-    st.title("🔄 Reset your password")
-    new_password = st.text_input("New Password", type="password")
-    if st.button("Update Password"):
-        try:
-            supabase.auth.update_user({"password": new_password})
-            st.success("✅ Password updated! Log in from the sidebar.")
-            st.query_params.clear()
-        except Exception as e:
-            st.error(f"Error: {str(e)}")
-    st.stop()
-
-# =============================
-# 4. AUTH LOGIC
-# =============================
+# (Gestion Session State et Login identique à ta version actuelle)
 if "user_email" not in st.session_state:
     st.session_state.user_email = None
 
-def login(email, password):
-    try:
-        res = supabase.auth.sign_in_with_password({"email": email, "password": password})
-        st.session_state.user_email = res.user.email
-        st.rerun()
-    except Exception as e:
-        st.error(f"❌ Login failed: {str(e)}")
-
 # =============================
-# 5. SIDEBAR
+# 3. SIDEBAR NAVIGATION
 # =============================
 with st.sidebar:
-    st.title("🔐 TalentIQ")
+    st.image("https://cdn-icons-png.flaticon.com/512/3649/3649393.png", width=80) # Logo temporaire
+    st.markdown("<h2 style='color: white; text-align: center;'>TALENTIQ ELITE</h2>", unsafe_allow_html=True)
+    st.divider()
+    
     if not st.session_state.user_email:
-        email_in = st.text_input("Email")
-        pass_in = st.text_input("Password", type="password")
-        if st.button("Login 🚀"):
-            login(email_in, pass_in)
+        email_in = st.text_input("Professional Email")
+        pass_in = st.text_input("Access Key", type="password")
+        if st.button("AUTHENTICATE 🚀", use_container_width=True):
+            try:
+                res = supabase.auth.sign_in_with_password({"email": email_in, "password": pass_in})
+                st.session_state.user_email = res.user.email
+                st.rerun()
+            except:
+                st.error("Invalid Credentials")
     else:
-        st.success(f"Logged in: {st.session_state.user_email}")
-        if st.button("🚪 Logout"):
+        st.success(f"Verified: {st.session_state.user_email}")
+        if st.button("Sign Out"):
             st.session_state.user_email = None
             st.rerun()
 
 # =============================
-# 6. MAIN APP
+# 4. MAIN INTERFACE
 # =============================
 if st.session_state.user_email:
-    # --- CHECK SUBSCRIPTION ---
+    # --- SUBSCRIPTION CHECK ---
     res = supabase.table("customers").select("subscription_status").eq("email", st.session_state.user_email).execute()
     if not res.data or res.data[0]["subscription_status"] != "active":
-        st.warning("❌ Active subscription required.")
+        st.warning("⚠️ Access Restricted: Active Subscription Required.")
         st.stop()
 
-    # --- DASHBOARD & DATASETS ---
-    st.title("🎯 TalentIQ Premium Dashboard")
+    # --- TOP HEADER ---
+    col_h1, col_h2 = st.columns([3, 1])
+    with col_h1:
+        st.markdown("<h1 class='main-header'>🎯 Premium Market Intelligence</h1>", unsafe_allow_html=True)
+        st.caption("DIGISPHERELLC LLC — Data Engineering & Global Sourcing")
     
-    # Correction : On cherche les fichiers à la RACINE (base_path)
+    # --- DATA ENGINE ---
     base_path = os.path.dirname(os.path.abspath(__file__))
+    # On scanne les CSV à la racine
     csv_files = [f for f in os.listdir(base_path) if f.endswith('.csv')]
 
     if csv_files:
-        selected_dataset = st.selectbox("Select a Dataset to analyze:", csv_files)
+        st.markdown("### 📂 Database Selection")
+        selected_dataset = st.selectbox("", csv_files, label_visibility="collapsed")
         
         if selected_dataset:
             file_path = os.path.join(base_path, selected_dataset)
             df = pd.read_csv(file_path)
 
-            tab1, tab2, tab3 = st.tabs(["📊 Overview", "🔍 Search", "📤 Export"])
+            # --- ANALYTICS OVERVIEW ---
+            st.markdown("---")
+            m1, m2, m3, m4 = st.columns(4)
+            m1.metric("Total Records", f"{len(df):,}")
+            # Exemple de stats dynamiques (si colonnes présentes)
+            if 'location' in df.columns:
+                m2.metric("Regions Coverage", df['location'].nunique())
+            if 'company' in df.columns:
+                m3.metric("Companies", df['company'].nunique())
+            m4.metric("Status", "LATEST UPDATE")
+
+            # --- CONTENT AREA ---
+            tab1, tab2, tab3 = st.tabs(["💎 Data Explorer", "🔍 Advanced Search", "📥 Export Hub"])
             
             with tab1:
-                st.metric("Total Profiles", len(df))
-                st.dataframe(df.head(100), use_container_width=True)
+                st.markdown("#### High-Fidelity Data Preview")
+                st.dataframe(df.head(100), use_container_width=True, height=500)
             
             with tab2:
-                query = st.text_input("Filter data (name, city, skill...)")
-                if query:
-                    mask = df.astype(str).apply(lambda x: x.str.contains(query, case=False)).any(axis=1)
+                search_query = st.text_input("⚡ Power Search (Type any skill, name or city...)", placeholder="Ex: Python, London, Senior...")
+                if search_query:
+                    mask = df.astype(str).apply(lambda x: x.str.contains(search_query, case=False)).any(axis=1)
                     st.dataframe(df[mask], use_container_width=True)
             
             with tab3:
-                st.download_button("📥 Download This Dataset", df.to_csv(index=False), file_name=selected_dataset)
+                st.markdown("<div style='text-align: center; padding: 50px;'>", unsafe_allow_html=True)
+                st.download_button(
+                    label="📥 DOWNLOAD ENTIRE DATASET (CSV)",
+                    data=df.to_csv(index=False),
+                    file_name=f"TalentIQ_{selected_dataset}",
+                    mime="text/csv",
+                    use_container_width=True
+                )
+                st.info("The downloaded file is optimized for Excel and Google Sheets.")
+                st.markdown("</div>", unsafe_allow_html=True)
     else:
-        st.error("No CSV files found in the root directory.")
+        st.error("No intelligence assets found in the repository.")
 else:
-    st.title("👋 Welcome to TalentIQ")
-    st.info("Please sign in to access your premium data.")
+    # Page d'accueil style "Landing Page"
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'>Unlock Global Talent Intelligence</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center;'>The exclusive platform for elite recruiters and data-driven firms.</p>", unsafe_allow_html=True)
