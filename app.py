@@ -20,13 +20,36 @@ st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     
+    /* ===== HIDE STREAMLIT BRANDING & WHITE HEADER ===== */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    
+    /* Hide the top decoration bar */
+    .stDeployButton {display: none;}
+    [data-testid="stHeader"] {
+        background: transparent !important;
+        display: none !important;
+    }
+    [data-testid="stToolbar"] {
+        display: none !important;
+    }
+    [data-testid="stDecoration"] {
+        display: none !important;
+    }
+    
     /* ===== GLOBAL DARK THEME ===== */
-    .stApp {
-        background: linear-gradient(135deg, #0a0a0f 0%, #141420 50%, #0d0d15 100%);
+    html, body, [data-testid="stAppViewContainer"], .stApp {
+        background: linear-gradient(135deg, #0a0a0f 0%, #141420 50%, #0d0d15 100%) !important;
+    }
+    
+    [data-testid="stAppViewContainer"] > .main {
+        background: transparent !important;
     }
     
     .main .block-container {
-        padding-top: 2rem;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
     }
     
     /* ===== SIDEBAR — PREMIUM DARK ===== */
