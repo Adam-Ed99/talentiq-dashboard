@@ -20,22 +20,39 @@ st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     
-    /* ===== HIDE STREAMLIT BRANDING & WHITE HEADER ===== */
+    /* ===== HIDE STREAMLIT BRANDING — KEEP SIDEBAR TOGGLE ===== */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    header {visibility: hidden;}
     
-    /* Hide the top decoration bar */
-    .stDeployButton {display: none;}
+    /* Make header transparent but keep it functional for sidebar toggle */
     [data-testid="stHeader"] {
         background: transparent !important;
-        display: none !important;
+        border: none !important;
     }
+    
+    /* Hide toolbar and decoration, but not the collapse button */
     [data-testid="stToolbar"] {
         display: none !important;
     }
     [data-testid="stDecoration"] {
         display: none !important;
+    }
+    .stDeployButton {
+        display: none !important;
+    }
+    
+    /* Style the sidebar collapse/expand button */
+    button[data-testid="stBaseButton-headerNoPadding"],
+    [data-testid="collapsedControl"] {
+        background: rgba(124, 58, 237, 0.2) !important;
+        border: 1px solid rgba(168, 139, 250, 0.3) !important;
+        border-radius: 8px !important;
+        color: #a78bfa !important;
+    }
+    
+    button[data-testid="stBaseButton-headerNoPadding"]:hover,
+    [data-testid="collapsedControl"]:hover {
+        background: rgba(124, 58, 237, 0.4) !important;
     }
     
     /* ===== GLOBAL DARK THEME ===== */
@@ -48,7 +65,7 @@ st.markdown("""
     }
     
     .main .block-container {
-        padding-top: 1rem;
+        padding-top: 0.5rem;
         padding-bottom: 1rem;
     }
     
@@ -735,13 +752,12 @@ else:
     # =============================
     
     # Spacer
-    st.markdown("<br>", unsafe_allow_html=True)
     
-    # Hero Section
+    # Hero Section - positioned higher
     col_landing = st.columns([1, 3, 1])[1]
     with col_landing:
         st.markdown("""
-            <div style="text-align: center; padding: 2rem 0;">
+            <div style="text-align: center; padding: 0.5rem 0 2rem 0;">
                 <div style="font-size: 4rem; margin-bottom: 1rem;">◆</div>
                 <h1 style="
                     font-family: 'Inter', sans-serif;
