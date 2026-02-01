@@ -710,37 +710,89 @@ else:
     # =============================
     # LANDING PAGE — NON CONNECTÉ
     # =============================
-    st.markdown("""
-        <div class="landing-container">
-            <div class="landing-icon">◆</div>
-            <h1 class="landing-title">Premium Data Intelligence</h1>
-            <p class="landing-desc">
-                Access exclusive market datasets curated for enterprise recruiters, 
-                research teams, and data-driven organizations worldwide.
-            </p>
-            
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🎯</div>
-                    <div class="feature-title">Curated Datasets</div>
-                    <div class="feature-desc">Premium talent pools & market data</div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">⚡</div>
-                    <div class="feature-title">Real-Time Updates</div>
-                    <div class="feature-desc">Fresh data synced continuously</div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔐</div>
-                    <div class="feature-title">Enterprise Security</div>
-                    <div class="feature-desc">SOC2 compliant infrastructure</div>
-                </div>
+    
+    # Spacer
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Hero Section
+    col_landing = st.columns([1, 3, 1])[1]
+    with col_landing:
+        st.markdown("""
+            <div style="text-align: center; padding: 2rem 0;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">◆</div>
+                <h1 style="
+                    font-family: 'Inter', sans-serif;
+                    font-size: 2.8rem;
+                    font-weight: 800;
+                    background: linear-gradient(135deg, #ffffff 0%, #a78bfa 50%, #c4b5fd 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-clip: text;
+                    margin-bottom: 1rem;
+                ">Premium Data Intelligence</h1>
+                <p style="color: #94a3b8; font-size: 1.1rem; line-height: 1.8; max-width: 600px; margin: 0 auto;">
+                    Access exclusive market datasets curated for enterprise recruiters, 
+                    research teams, and data-driven organizations worldwide.
+                </p>
             </div>
-        </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Feature Cards using Streamlit columns
+    f1, f2, f3 = st.columns(3)
+    
+    with f1:
+        st.markdown("""
+            <div style="
+                background: rgba(255, 255, 255, 0.02);
+                border: 1px solid rgba(168, 139, 250, 0.15);
+                border-radius: 16px;
+                padding: 2rem 1.5rem;
+                text-align: center;
+                height: 180px;
+            ">
+                <div style="font-size: 2.5rem; margin-bottom: 1rem;">🎯</div>
+                <div style="color: #e2e8f0; font-weight: 600; margin-bottom: 0.5rem;">Curated Datasets</div>
+                <div style="color: #64748b; font-size: 0.9rem;">Premium talent pools & market data</div>
+            </div>
+        """, unsafe_allow_html=True)
+    
+    with f2:
+        st.markdown("""
+            <div style="
+                background: rgba(255, 255, 255, 0.02);
+                border: 1px solid rgba(168, 139, 250, 0.15);
+                border-radius: 16px;
+                padding: 2rem 1.5rem;
+                text-align: center;
+                height: 180px;
+            ">
+                <div style="font-size: 2.5rem; margin-bottom: 1rem;">⚡</div>
+                <div style="color: #e2e8f0; font-weight: 600; margin-bottom: 0.5rem;">Real-Time Updates</div>
+                <div style="color: #64748b; font-size: 0.9rem;">Fresh data synced continuously</div>
+            </div>
+        """, unsafe_allow_html=True)
+    
+    with f3:
+        st.markdown("""
+            <div style="
+                background: rgba(255, 255, 255, 0.02);
+                border: 1px solid rgba(168, 139, 250, 0.15);
+                border-radius: 16px;
+                padding: 2rem 1.5rem;
+                text-align: center;
+                height: 180px;
+            ">
+                <div style="font-size: 2.5rem; margin-bottom: 1rem;">🔐</div>
+                <div style="color: #e2e8f0; font-weight: 600; margin-bottom: 0.5rem;">Enterprise Security</div>
+                <div style="color: #64748b; font-size: 0.9rem;">SOC2 compliant infrastructure</div>
+            </div>
+        """, unsafe_allow_html=True)
     
     st.markdown("<br><br>", unsafe_allow_html=True)
     
+    # CTA
     col_cta = st.columns([1, 2, 1])[1]
     with col_cta:
         st.info("👈 Sign in from the sidebar to access your premium datasets")
