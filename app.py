@@ -829,9 +829,62 @@ else:
             </div>
         """, unsafe_allow_html=True)
     
-    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
     
-    # CTA
-    col_cta = st.columns([1, 2, 1])[1]
-    with col_cta:
-        st.info("👈 Sign in from the sidebar to access your premium datasets")
+    # ===== LOGIN FORM IN MAIN CONTENT (Backup when sidebar is hidden) =====
+    st.markdown("""
+        <div style="text-align: center; margin-bottom: 1rem;">
+            <span style="
+                color: #a78bfa;
+                font-size: 0.85rem;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                font-weight: 600;
+            ">🔐 Secure Access Portal</span>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    # Login form centered
+    login_col = st.columns([1, 1.5, 1])[1]
+    with login_col:
+        with st.container():
+            st.markdown("""
+                <div style="
+                    background: rgba(255, 255, 255, 0.02);
+                    border: 1px solid rgba(168, 139, 250, 0.2);
+                    border-radius: 16px;
+                    padding: 2rem;
+                    margin-bottom: 1rem;
+                ">
+            """, unsafe_allow_html=True)
+            
+            main_email = st.text_input("Email", placeholder="your@company.com", key="main_email")
+            main_password = st.text_input("Password", type="password", placeholder="••••••••", key="main_password")
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            
+            if st.button("🚀 ACCESS DASHBOARD", use_container_width=True, key="main_login_btn"):
+                if main_email and main_password:
+                    try:
+                        res = supabase.auth.sign_in_with_password({
+                            "email": main_email,
+                            "password": main_password
+                        })
+                        st.session_state.user_email = res.user.email
+                        st.session_state.user_id = res.user.id
+                        st.success("✅ Access Granted")
+                        st.rerun()
+                    except Exception as e:
+                        st.error("❌ Invalid credentials")
+                else:
+                    st.warning("Please enter email and password")
+            
+            st.markdown("</div>", unsafe_allow_html=True)
+    
+    st.markdown("""
+        <div style="text-align: center; padding: 1.5rem; color: #4a5568; font-size: 0.75rem;">
+            By signing in, you agree to our Terms of Service<br>
+            <span style="color: #64748b;">DIGISPHERELLC LLC • Delaware, USA</span>
+        </div>
+    """, unsafe_allow_html=True)
+
