@@ -748,143 +748,187 @@ if user_email:
 
 else:
     # =============================
-    # LANDING PAGE — NON CONNECTÉ
+    # LANDING PAGE — 2 COLUMNS LAYOUT
+    # LEFT: Login Form | RIGHT: Hero + Features
     # =============================
     
-    # Spacer
+    # Main 2-column layout
+    col_login, col_spacer, col_content = st.columns([1.2, 0.2, 2.5])
     
-    # Hero Section - positioned higher
-    col_landing = st.columns([1, 3, 1])[1]
-    with col_landing:
+    # ===== LEFT COLUMN: LOGIN FORM =====
+    with col_login:
+        # Brand
         st.markdown("""
-            <div style="text-align: center; padding: 0.5rem 0 2rem 0;">
-                <div style="font-size: 4rem; margin-bottom: 1rem;">◆</div>
+            <div style="text-align: center; padding: 1rem 0 2rem 0;">
+                <div style="font-size: 3rem; margin-bottom: 0.5rem;">◆</div>
+                <div style="
+                    font-family: 'Inter', sans-serif;
+                    font-size: 1.2rem;
+                    font-weight: 700;
+                    background: linear-gradient(135deg, #a78bfa 0%, #c4b5fd 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-clip: text;
+                    letter-spacing: 3px;
+                ">DIGISPHERE</div>
+                <div style="color: #4a5568; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; margin-top: 4px;">
+                    Premium Data Intelligence
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        # Login Card
+        st.markdown("""
+            <div style="
+                background: rgba(255, 255, 255, 0.02);
+                border: 1px solid rgba(168, 139, 250, 0.15);
+                border-radius: 20px;
+                padding: 2rem;
+            ">
+                <div style="
+                    color: #a78bfa;
+                    font-size: 0.75rem;
+                    text-transform: uppercase;
+                    letter-spacing: 2px;
+                    font-weight: 600;
+                    margin-bottom: 1.5rem;
+                    text-align: center;
+                ">🔐 Secure Access</div>
+        """, unsafe_allow_html=True)
+        
+        main_email = st.text_input("Professional Email", placeholder="your@company.com", key="main_email", label_visibility="collapsed")
+        main_password = st.text_input("Access Key", type="password", placeholder="Password", key="main_password", label_visibility="collapsed")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        if st.button("ACCESS DASHBOARD →", use_container_width=True, key="main_login_btn"):
+            if main_email and main_password:
+                try:
+                    res = supabase.auth.sign_in_with_password({
+                        "email": main_email,
+                        "password": main_password
+                    })
+                    st.session_state.user_email = res.user.email
+                    st.session_state.user_id = res.user.id
+                    st.success("✅ Access Granted")
+                    st.rerun()
+                except Exception as e:
+                    st.error("❌ Invalid credentials")
+            else:
+                st.warning("Enter email and password")
+        
+        st.markdown("</div>", unsafe_allow_html=True)
+        
+        # Footer
+        st.markdown("""
+            <div style="text-align: center; padding: 2rem 0 0 0;">
+                <div style="color: #4a5568; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px;">
+                    Powered by
+                </div>
+                <div style="color: #64748b; font-size: 0.7rem; font-weight: 500; margin-top: 4px;">
+                    DIGISPHERELLC LLC
+                </div>
+                <div style="color: #4a5568; font-size: 0.55rem; margin-top: 2px;">
+                    Delaware, USA
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+    
+    # ===== RIGHT COLUMN: HERO + FEATURES =====
+    with col_content:
+        # Hero Title
+        st.markdown("""
+            <div style="padding: 0 0 1.5rem 0;">
                 <h1 style="
                     font-family: 'Inter', sans-serif;
-                    font-size: 2.8rem;
+                    font-size: 3rem;
                     font-weight: 800;
                     background: linear-gradient(135deg, #ffffff 0%, #a78bfa 50%, #c4b5fd 100%);
                     -webkit-background-clip: text;
                     -webkit-text-fill-color: transparent;
                     background-clip: text;
-                    margin-bottom: 1rem;
-                ">Premium Data Intelligence</h1>
-                <p style="color: #94a3b8; font-size: 1.1rem; line-height: 1.8; max-width: 600px; margin: 0 auto;">
+                    margin-bottom: 0.75rem;
+                    line-height: 1.1;
+                ">Premium Data<br>Intelligence</h1>
+                <p style="color: #94a3b8; font-size: 1rem; line-height: 1.7; max-width: 500px;">
                     Access exclusive market datasets curated for enterprise recruiters, 
                     research teams, and data-driven organizations worldwide.
                 </p>
             </div>
         """, unsafe_allow_html=True)
-    
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    # Feature Cards using Streamlit columns
-    f1, f2, f3 = st.columns(3)
-    
-    with f1:
-        st.markdown("""
-            <div style="
-                background: rgba(255, 255, 255, 0.02);
-                border: 1px solid rgba(168, 139, 250, 0.15);
-                border-radius: 16px;
-                padding: 2rem 1.5rem;
-                text-align: center;
-                height: 180px;
-            ">
-                <div style="font-size: 2.5rem; margin-bottom: 1rem;">🎯</div>
-                <div style="color: #e2e8f0; font-weight: 600; margin-bottom: 0.5rem;">Curated Datasets</div>
-                <div style="color: #64748b; font-size: 0.9rem;">Premium talent pools & market data</div>
-            </div>
-        """, unsafe_allow_html=True)
-    
-    with f2:
-        st.markdown("""
-            <div style="
-                background: rgba(255, 255, 255, 0.02);
-                border: 1px solid rgba(168, 139, 250, 0.15);
-                border-radius: 16px;
-                padding: 2rem 1.5rem;
-                text-align: center;
-                height: 180px;
-            ">
-                <div style="font-size: 2.5rem; margin-bottom: 1rem;">⚡</div>
-                <div style="color: #e2e8f0; font-weight: 600; margin-bottom: 0.5rem;">Real-Time Updates</div>
-                <div style="color: #64748b; font-size: 0.9rem;">Fresh data synced continuously</div>
-            </div>
-        """, unsafe_allow_html=True)
-    
-    with f3:
-        st.markdown("""
-            <div style="
-                background: rgba(255, 255, 255, 0.02);
-                border: 1px solid rgba(168, 139, 250, 0.15);
-                border-radius: 16px;
-                padding: 2rem 1.5rem;
-                text-align: center;
-                height: 180px;
-            ">
-                <div style="font-size: 2.5rem; margin-bottom: 1rem;">🔐</div>
-                <div style="color: #e2e8f0; font-weight: 600; margin-bottom: 0.5rem;">Enterprise Security</div>
-                <div style="color: #64748b; font-size: 0.9rem;">SOC2 compliant infrastructure</div>
-            </div>
-        """, unsafe_allow_html=True)
-    
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    # ===== LOGIN FORM IN MAIN CONTENT (Backup when sidebar is hidden) =====
-    st.markdown("""
-        <div style="text-align: center; margin-bottom: 1rem;">
-            <span style="
-                color: #a78bfa;
-                font-size: 0.85rem;
-                text-transform: uppercase;
-                letter-spacing: 2px;
-                font-weight: 600;
-            ">🔐 Secure Access Portal</span>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    # Login form centered
-    login_col = st.columns([1, 1.5, 1])[1]
-    with login_col:
-        with st.container():
+        
+        # Feature Cards - 3 columns inside the right column
+        fc1, fc2, fc3 = st.columns(3)
+        
+        with fc1:
             st.markdown("""
                 <div style="
                     background: rgba(255, 255, 255, 0.02);
-                    border: 1px solid rgba(168, 139, 250, 0.2);
-                    border-radius: 16px;
-                    padding: 2rem;
-                    margin-bottom: 1rem;
+                    border: 1px solid rgba(168, 139, 250, 0.12);
+                    border-radius: 14px;
+                    padding: 1.25rem 1rem;
+                    text-align: center;
                 ">
+                    <div style="font-size: 1.8rem; margin-bottom: 0.5rem;">🎯</div>
+                    <div style="color: #e2e8f0; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">Curated Datasets</div>
+                    <div style="color: #64748b; font-size: 0.75rem;">Premium talent pools</div>
+                </div>
             """, unsafe_allow_html=True)
-            
-            main_email = st.text_input("Email", placeholder="your@company.com", key="main_email")
-            main_password = st.text_input("Password", type="password", placeholder="••••••••", key="main_password")
-            
-            st.markdown("<br>", unsafe_allow_html=True)
-            
-            if st.button("🚀 ACCESS DASHBOARD", use_container_width=True, key="main_login_btn"):
-                if main_email and main_password:
-                    try:
-                        res = supabase.auth.sign_in_with_password({
-                            "email": main_email,
-                            "password": main_password
-                        })
-                        st.session_state.user_email = res.user.email
-                        st.session_state.user_id = res.user.id
-                        st.success("✅ Access Granted")
-                        st.rerun()
-                    except Exception as e:
-                        st.error("❌ Invalid credentials")
-                else:
-                    st.warning("Please enter email and password")
-            
-            st.markdown("</div>", unsafe_allow_html=True)
-    
-    st.markdown("""
-        <div style="text-align: center; padding: 1.5rem; color: #4a5568; font-size: 0.75rem;">
-            By signing in, you agree to our Terms of Service<br>
-            <span style="color: #64748b;">DIGISPHERELLC LLC • Delaware, USA</span>
-        </div>
-    """, unsafe_allow_html=True)
+        
+        with fc2:
+            st.markdown("""
+                <div style="
+                    background: rgba(255, 255, 255, 0.02);
+                    border: 1px solid rgba(168, 139, 250, 0.12);
+                    border-radius: 14px;
+                    padding: 1.25rem 1rem;
+                    text-align: center;
+                ">
+                    <div style="font-size: 1.8rem; margin-bottom: 0.5rem;">⚡</div>
+                    <div style="color: #e2e8f0; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">Real-Time Updates</div>
+                    <div style="color: #64748b; font-size: 0.75rem;">Fresh data synced</div>
+                </div>
+            """, unsafe_allow_html=True)
+        
+        with fc3:
+            st.markdown("""
+                <div style="
+                    background: rgba(255, 255, 255, 0.02);
+                    border: 1px solid rgba(168, 139, 250, 0.12);
+                    border-radius: 14px;
+                    padding: 1.25rem 1rem;
+                    text-align: center;
+                ">
+                    <div style="font-size: 1.8rem; margin-bottom: 0.5rem;">🔐</div>
+                    <div style="color: #e2e8f0; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">Enterprise Security</div>
+                    <div style="color: #64748b; font-size: 0.75rem;">SOC2 compliant</div>
+                </div>
+            """, unsafe_allow_html=True)
+        
+        # Stats or testimonial area
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("""
+            <div style="
+                background: rgba(124, 58, 237, 0.08);
+                border: 1px solid rgba(168, 139, 250, 0.15);
+                border-radius: 12px;
+                padding: 1rem 1.5rem;
+                display: flex;
+                gap: 2rem;
+            ">
+                <div style="text-align: center; flex: 1;">
+                    <div style="color: #a78bfa; font-size: 1.5rem; font-weight: 700;">50K+</div>
+                    <div style="color: #64748b; font-size: 0.7rem; text-transform: uppercase;">Profiles</div>
+                </div>
+                <div style="text-align: center; flex: 1;">
+                    <div style="color: #a78bfa; font-size: 1.5rem; font-weight: 700;">120+</div>
+                    <div style="color: #64748b; font-size: 0.7rem; text-transform: uppercase;">Countries</div>
+                </div>
+                <div style="text-align: center; flex: 1;">
+                    <div style="color: #a78bfa; font-size: 1.5rem; font-weight: 700;">99.9%</div>
+                    <div style="color: #64748b; font-size: 0.7rem; text-transform: uppercase;">Uptime</div>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+
 
